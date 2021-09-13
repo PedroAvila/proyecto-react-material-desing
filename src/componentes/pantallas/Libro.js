@@ -1,6 +1,7 @@
-import { Button, Card, Container, Grid, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@material-ui/core';
-import React, { useState } from 'react';
+import { Button, Card, Container, Dialog, DialogContent, DialogTitle, Grid, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
 import useStyles from '../../theme/useStyles';
+import { agregarLibro, listarLibros } from '../data/libros';
 
 const clearLibro = {
     categoria: '',
@@ -25,16 +26,53 @@ const Libro = () => {
     }
 
     const guardarData = () => {
-        console.log("Mis datos son", libro)
+        agregarLibro(libro)
         setLibro(clearLibro)
     }
 
+    const [ librosArray, setLibrosArray ] = useState([])
+
+    const listarDataLibros = () => {
+        const data = listarLibros()
+        setLibrosArray(data)
+    }
+
+    useEffect(() => {
+        listarDataLibros()
+    }, [librosArray.length])
+
     const abrirDialog = () => {
+        setOpen(true)
         console.log("mi boton editar")
     }
 
     const eliminarData = () => {
         console.log("boton eliminar")
+    }
+
+    const [ libroEdita, setLibroEdita ] = useState({
+        categoriaE: '',
+        tituloE: '',
+        autorE: ''  
+    })
+
+    const handleChangeEdita = (e) => {
+        const { name, value } = e.target
+        setLibroEdita(prev => ({
+            ...prev,
+            [name]: value
+        }))
+    }
+
+    const [ open, setOpen ] = useState(false)
+
+    const cerrarDialog =() => {
+        setOpen(false)
+    }
+
+    const editarData = () => {
+        console.log("boton editar data", libroEdita)
+        cerrarDialog()
     }
 
     const classes = useStyles()
@@ -112,32 +150,88 @@ const Libro = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        <TableRow>
-                        <TableCell>Programacion</TableCell>
-                        <TableCell>React Avanzado</TableCell>
-                        <TableCell>Vaxi Drez</TableCell>
-                        <TableCell>
-                            <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={ abrirDialog }
-                            >
-                                Editar
-                            </Button>
-                        </TableCell>
-                        <TableCell>
-                            <Button
-                            variant="contained"
-                            color="secondary"
-                            onClick={ eliminarData }
-                            >
-                                Eliminar
-                            </Button>
-                        </TableCell>
-                        </TableRow>
+                        { librosArray.map((libroObj) => (
+                            <TableRow key={ libroObj.key }>
+                            <TableCell>{ libroObj.categoria }</TableCell>
+                            <TableCell>{ libroObj.titulo }</TableCell>
+                            <TableCell>{ libroObj.autor }</TableCell>
+                            <TableCell>
+                                <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={ abrirDialog }
+                                >
+                                    Editar
+                                </Button>
+                            </TableCell>
+                            <TableCell>
+                                <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={ eliminarData }
+                                >
+                                    Eliminar
+                                </Button>
+                            </TableCell>
+                            </TableRow>
+                        )) }
+                        
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Dialog open={ open } onClose={ cerrarDialog } maxWidth="xs" fullWidth align="center">
+                <DialogTitle>Editar Libro</DialogTitle>
+                <DialogContent>
+                    <form onSubmit={ (e) => e.preventDefault() }>
+                        <TextField
+                            select
+                            label="Categoría"
+                            variant="outlined"
+                            fullWidth
+                            align="left"
+                            name="categoriaE"
+                            value={ libroEdita.categoriaE }
+                            className={ classes.gridmb }
+                            onChange={ handleChangeEdita }
+                        >
+                            <MenuItem value="Programacion">Programacion</MenuItem>
+                            <MenuItem value="Historia">Historia</MenuItem>
+                            <MenuItem value="Matematica">Matematica</MenuItem>
+                        </TextField>
+
+                        <TextField 
+                            label="Titulo"
+                            variant="outlined"
+                            fullWidth
+                            name="tituloE"
+                            value={ libroEdita.tituloE }
+                            className={ classes.gridmb }
+                            onChange={ handleChangeEdita }
+                        />
+
+                        <TextField 
+                            label="Autor"
+                            variant="outlined"
+                            fullWidth
+                            name="autorE"
+                            value={ libroEdita.autorE }
+                            className={ classes.gridmb }
+                            onChange={ handleChangeEdita }
+                        />
+
+                        <Button
+                            variant="contained"
+                            fullWidth
+                            color="primary"
+                            className={ classes.gridmb }
+                            type="submit"
+                            onClick={ editarData }
+                        >
+                                Guardar
+                        </Button>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </Container>
     )
 }
