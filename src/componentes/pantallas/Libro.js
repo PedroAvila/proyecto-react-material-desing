@@ -1,7 +1,7 @@
 import { Button, Card, Container, Dialog, DialogContent, DialogTitle, Grid, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import useStyles from '../../theme/useStyles';
-import { agregarLibro, listarLibros } from '../data/libros';
+import { agregarLibro, listarLibros, obtenerLibroKey, editarLibro } from '../data/libros';
 
 const clearLibro = {
     categoria: '',
@@ -41,8 +41,15 @@ const Libro = () => {
         listarDataLibros()
     }, [librosArray.length])
 
-    const abrirDialog = () => {
+    const abrirDialog = (key) => {
         setOpen(true)
+        const dataLibro = obtenerLibroKey(key)
+        setLibroEdita({
+            key: key,
+            categoriaE: dataLibro.categoria,
+            tituloE: dataLibro.titulo,
+            autorE: dataLibro.autor
+        })
         console.log("mi boton editar")
     }
 
@@ -51,6 +58,7 @@ const Libro = () => {
     }
 
     const [ libroEdita, setLibroEdita ] = useState({
+        key: 0,
         categoriaE: '',
         tituloE: '',
         autorE: ''  
@@ -71,7 +79,8 @@ const Libro = () => {
     }
 
     const editarData = () => {
-        console.log("boton editar data", libroEdita)
+        const nuevaData = editarLibro(libroEdita)
+        console.log("boton editar data", nuevaData)
         cerrarDialog()
     }
 
@@ -159,7 +168,7 @@ const Libro = () => {
                                 <Button
                                 variant="contained"
                                 color="primary"
-                                onClick={ abrirDialog }
+                                onClick={ () => abrirDialog(libroObj.key) }
                                 >
                                     Editar
                                 </Button>

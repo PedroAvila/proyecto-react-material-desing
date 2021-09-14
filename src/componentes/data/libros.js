@@ -13,3 +13,22 @@ export const agregarLibro = (libro) => {
 export const listarLibros = () => {
     return librosArray 
 }
+
+export const obtenerLibroKey = (clave) => {
+    const objLibro = librosArray.find(libro => { return libro.key === clave })
+    return objLibro
+}
+
+export const editarLibro = (dataLibro) => {
+    librosArray.forEach(libro => {
+        if (dataLibro.key === libro.key) {
+            libro.categoria = dataLibro.categoriaE
+            libro.titulo = dataLibro.tituloE
+            libro.autor = dataLibro.autorE
+        }
+    })
+    return librosArray
+}
+
+
+
